@@ -34,7 +34,13 @@ endif()
 list(APPEND SOURCES vpl/mfx_dispatcher_vpl.cpp
      vpl/mfx_dispatcher_vpl_loader.cpp vpl/mfx_dispatcher_vpl_config.cpp)
 
-add_library(${TARGET} SHARED "")
+option(OPTION_BUILD_STATIC_LIB "Build static library." OFF)
+
+if(OPTION_BUILD_STATIC_LIB)
+  add_library(${TARGET} STATIC "")
+else()
+  add_library(${TARGET} SHARED "")
+endif()
 
 if(WIN32)
   # force correct name on Windows
@@ -63,7 +69,8 @@ install(
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT dev)
 
 # export(PACKAGE VPL)
-
+configure_file(${PROJECT_SOURCE_DIR}/cmake/templates/libmfx.pc.cmake.in
+               ${PROJECT_BINARY_DIR}/libmfx.pc @ONLY)
 configure_file(${PROJECT_SOURCE_DIR}/cmake/templates/VPLConfig.cmake.in
                ${PROJECT_BINARY_DIR}/VPLConfig.cmake @ONLY)
 configure_file(${PROJECT_SOURCE_DIR}/cmake/templates/VPLConfigVersion.cmake.in
@@ -73,4 +80,9 @@ install(
   FILES "${PROJECT_BINARY_DIR}/VPLConfig.cmake"
         "${PROJECT_BINARY_DIR}/VPLConfigVersion.cmake"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/vpl"
+  COMPONENT dev)
+
+install(
+  FILES "${PROJECT_BINARY_DIR}/libmfx.pc"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/vpl"
   COMPONENT dev)
